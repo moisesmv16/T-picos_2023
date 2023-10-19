@@ -1,0 +1,14 @@
+.panel-primary{
+    -fx-background-color: white;
+}
+
+.panel-title{
+    -fx-text-fill: white; /* Title text color: White */
+    -fx-font-size: 20; /* Title font size: 20pt */
+}
+
+.button {
+    -fx-border-radius: 40;
+    -fx-text-fill: white; /* Button text color: White */
+    -fx-font-size: 14; /* Button font size: 14pt */
+}
