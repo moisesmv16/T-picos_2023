@@ -34,8 +34,8 @@ public class ButtonCell2 extends TableCell<CategoriasDAO,String> {
             Optional<ButtonType> result = alert.showAndWait();
 
             if(result.get() == ButtonType.OK){
-                objPro.ELIMINARPRODUCTO();
-                tbvProducto.setItems(objPro.LISTARPRODUCTOS());
+                objPro.ELIMINARPLATILLO();
+                tbvProducto.setItems(objPro.LISTARPLATILLOS());
                 tbvProducto.refresh();
             }
         }

@@ -35,7 +35,7 @@ public class Baileys extends Stage {
     private Button btnOrdenar,btnSugerencia;
     private CategoriasDAO categoriasDAO;
     //private ObservableList<CategoriasDAO> tacosDePastorList = FXCollections.observableArrayList();
-
+    private int categoriaID;
 
     public Baileys(){
         CrearUI();
@@ -108,7 +108,10 @@ public class Baileys extends Stage {
         btnTacos = new Button("Tacos");
         btnTacos.setGraphic(imv);
         btnTacos.getStyleClass().setAll("btn","btn-default");
-        btnTacos.setOnAction(event -> AbrirTacos());
+        btnTacos.setOnAction(event -> {
+            AbrirTacos();
+            CategoriaTacos();
+        });
 
         Image imgPostres = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\2.jpg");
         ImageView imv1 = new ImageView(imgPostres);
@@ -197,7 +200,7 @@ public class Baileys extends Stage {
         btnTacoCabeza.setGraphic(imv5);
         btnTacoCabeza.getStyleClass().setAll("btn","btn-default");
         btnTacoCabeza.setOnAction(event -> {
-            AgregarTacoCabeza();
+           // AgregarTacoCabeza();
         });
 
         vBox3=new VBox();
@@ -213,7 +216,7 @@ public class Baileys extends Stage {
         btnTacoCostilla.setGraphic(imv6);
         btnTacoCostilla.getStyleClass().setAll("btn","btn-default");
         btnTacoCostilla.setOnAction(event -> {
-            AgregarTacoCostilla();
+           // AgregarTacoCostilla();
         });
 
         Image imgTacosChorizo = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\8.jpg");
@@ -225,7 +228,7 @@ public class Baileys extends Stage {
         btnTacoChorizo.setGraphic(imv7);
         btnTacoChorizo.getStyleClass().setAll("btn","btn-default");
         btnTacoChorizo.setOnAction(event -> {
-            AgregarTacoChorizo();
+           // AgregarTacoChorizo();
         });
 
         vBox4=new VBox();
@@ -244,7 +247,7 @@ public class Baileys extends Stage {
         btnPay.setGraphic(imv8);
         btnPay.getStyleClass().setAll("btn","btn-default");
         btnPay.setOnAction(event -> {
-            AgregarPay();
+          //  AgregarPay();
         });
 
         Image imgHelado = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\10.jpg");
@@ -256,7 +259,7 @@ public class Baileys extends Stage {
         btnHelado.setGraphic(imv9);
         btnHelado.getStyleClass().setAll("btn","btn-default");
         btnHelado.setOnAction(event -> {
-            AgregarHelado();
+            //AgregarHelado();
         });
 
         vBoxPostre1=new VBox();
@@ -272,7 +275,7 @@ public class Baileys extends Stage {
         btnGelatina.setGraphic(imv10);
         btnGelatina.getStyleClass().setAll("btn","btn-default");
         btnGelatina.setOnAction(event -> {
-            AgregarGelatina();
+            //AgregarGelatina();
         });
 
         Image imgPastel = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\12.jpg");
@@ -284,7 +287,7 @@ public class Baileys extends Stage {
         btnPastel.setGraphic(imv11);
         btnPastel.getStyleClass().setAll("btn","btn-default");
         btnPastel.setOnAction(event -> {
-            AgregarPastel();
+            //AgregarPastel();
         });
 
         vBoxPostre2=new VBox();
@@ -302,7 +305,7 @@ public class Baileys extends Stage {
         btnAlambre.setGraphic(imv12);
         btnAlambre.getStyleClass().setAll("btn","btn-default");
         btnAlambre.setOnAction(event -> {
-            AgregarAlambre();
+            //AgregarAlambre();
         });
 
         Image imgAsada = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\14.jpg");
@@ -314,7 +317,7 @@ public class Baileys extends Stage {
         btnCarneAsada.setGraphic(imv13);
         btnCarneAsada.getStyleClass().setAll("btn","btn-default");
         btnCarneAsada.setOnAction(event -> {
-            AgregarAsada();
+           // AgregarAsada();
         });
 
         vBoxEspe1=new VBox();
@@ -330,7 +333,7 @@ public class Baileys extends Stage {
         btnPapa.setGraphic(imv14);
         btnPapa.getStyleClass().setAll("btn","btn-default");
         btnPapa.setOnAction(event -> {
-            AgregarPapa();
+           // AgregarPapa();
         });
 
         Image imgVolcan = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\16.jpg");
@@ -342,7 +345,7 @@ public class Baileys extends Stage {
         btnVolcanes.setGraphic(imv15);
         btnVolcanes.getStyleClass().setAll("btn","btn-default");
         btnVolcanes.setOnAction(event -> {
-            AgregarVolcanes();
+            //AgregarVolcanes();
         });
 
         vBoxEspe2=new VBox();
@@ -360,7 +363,7 @@ public class Baileys extends Stage {
         btnCoca.setGraphic(imv16);
         btnCoca.getStyleClass().setAll("btn","btn-default");
         btnCoca.setOnAction(event -> {
-            AgregarCoca();
+            //AgregarCoca();
         });
 
         Image imgAguaNatural = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\18.jpg");
@@ -372,7 +375,7 @@ public class Baileys extends Stage {
         btnAguaNatural.setGraphic(imv17);
         btnAguaNatural.getStyleClass().setAll("btn","btn-default");
         btnAguaNatural.setOnAction(event -> {
-            AgregarAgua();
+            //AgregarAgua();
         });
 
         vBoxBebi1=new VBox();
@@ -388,7 +391,7 @@ public class Baileys extends Stage {
         btnAguaLimon.setGraphic(imv18);
         btnAguaLimon.getStyleClass().setAll("btn","btn-default");
         btnAguaLimon.setOnAction(event -> {
-            AgregarAguaLimon();
+            //AgregarAguaLimon();
         });
 
         Image imgPepsi = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\20.jpg");
@@ -400,7 +403,7 @@ public class Baileys extends Stage {
         btnPepsi.setGraphic(imv19);
         btnPepsi.getStyleClass().setAll("btn","btn-default");
         btnPepsi.setOnAction(event -> {
-            AgregarPepsi();
+           // AgregarPepsi();
         });
 
         vBoxBebi2=new VBox();
@@ -427,7 +430,7 @@ public class Baileys extends Stage {
                 }
         );
         tbvProducto.getColumns().addAll(tbcCarrito,tbcNomPro,tbcEliminar);
-        tbvProducto.setItems(categoriasDAO.LISTARPRODUCTOS());
+        tbvProducto.setItems(categoriasDAO.LISTARPLATILLOS());
     }
 
     public void CrearSuge(){
@@ -463,6 +466,12 @@ public class Baileys extends Stage {
         tbvCategorias.getItems().clear();
         btnCerveza.setDisable(false);
         btnBurrito.setDisable(false);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Registro Exitoso");
+        alert.setHeaderText(null);
+        alert.setContentText("Gracias por su Sugerencia");
+        alert.getButtonTypes().setAll(ButtonType.OK);
+        alert.showAndWait();
     }
 
     private void AbrirTacos(){
@@ -575,19 +584,34 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    public void AgregarTacoPastor(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Taco de Pastor");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
-        }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
+    public void CategoriaTacos(){
+        CategoriasDAO agregar = new CategoriasDAO();
+        agregar.setNomCategoria("Tacos");
+        agregar.INSERTARCATEGORIAS();
+        categoriaID = agregar.getIdCategoria(); // Obtener el ID después de insertar la categoría
+        //tbvCategorias.setItems(agregar.LISTARCATEGORIAS());
+        //tbvCategorias.refresh();
     }
 
+    public void AgregarTacoPastor(){
+        CategoriasDAO pedido = new CategoriasDAO();
+        pedido.setNomPlatillo("Taco de Pastor");
+        pedido.setprecio(8);
+        pedido.setimagen("5.jpg");
+
+        pedido.setIdCategoria(categoriaID);
+
+        pedido.INSERTARPLATILLO();
+
+        int ProductID = pedido.getIdPlatillo();
+
+        if (ProductID > 0){
+            pedido.setIdPlatillo(ProductID);
+        }
+        //tbvProducto.setItems(pedido.LISTARPLATILLOS());
+        //tbvProducto.refresh();
+    }
+/*
     public void AgregarTacoCabeza(){
         CategoriasDAO pedido = new CategoriasDAO();
         pedido.setNomProducto("Taco de Cabeza");
@@ -782,7 +806,7 @@ public class Baileys extends Stage {
         tbvProducto.setItems(pedido.LISTARPRODUCTOS());
         tbvProducto.refresh();
     }
-
+*/
     public void SugerirCerveza(){
         CategoriasDAO sugerir = new CategoriasDAO();
         sugerir.setNomCategoria("Bebidas");

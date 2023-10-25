@@ -17,6 +17,12 @@ public class CategoriasDAO {
     private String nomCategoria;
     private int idProducto;
     private String nomProducto;
+    private int idPlatillo;
+    private String nomPlatillo;
+    private int precio;
+    private String imagen;
+
+
 
     public int getIdCategoria() {
         return idCategoria;
@@ -33,14 +39,16 @@ public class CategoriasDAO {
     public void setNomCategoria(String nomCategoria) {
         this.nomCategoria = nomCategoria;
     }
+    public int getIdPlatillo() {return idPlatillo;}
+    public void setIdPlatillo(int idPlatillo) {this.idPlatillo = idPlatillo;}
+    public String getNomPlatillo() {return nomPlatillo;}
+    public void setNomPlatillo(String nomPlatillo) {this.nomPlatillo = nomPlatillo;}
+    public int getprecio() {return precio;}
+    public void setprecio(int precio) {this.precio = precio;}
+    public String getimagen() {return imagen;}
+    public void setimagen(String imagen) {this.imagen = imagen;}
 
-    public int getIdProducto() {return idProducto;}
 
-    public void setIdProducto(int idProducto) {this.idProducto = idProducto;}
-
-    public String getNomProducto() {return nomProducto;}
-
-    public void setNomProducto(String nomProducto) {this.nomProducto = nomProducto;}
 
     public void INSERTAR(){
         try{
@@ -94,10 +102,10 @@ public class CategoriasDAO {
         return ListCat;
     }
 
-    public void INSERTARPRODUCTO(){
-        try {
-            String query = "INSERT INTO Carrito"+
-                    "(nomProducto) VALUES('"+this.nomProducto+"')";
+    public void INSERTARCATEGORIAS(){
+        try{
+            String query = "INSERT INTO tblCategorias"+
+                    "(nomCategoria) VALUES('"+this.nomCategoria+"')";
             Statement stmt = Conexion.conexion.createStatement();
             stmt.executeUpdate(query);
         }catch (Exception e){
@@ -105,10 +113,20 @@ public class CategoriasDAO {
         }
     }
 
-    public void ACTUALIZARPRODUCTO(){
+    public void INSERTARPLATILLO(){
+        try {
+            String query = "INSERT INTO Platillo (nomPlatillo, precio, imagen) VALUES ('" + this.nomPlatillo + "', '" + this.precio + "', '" + this.imagen + "')";
+            Statement stmt = Conexion.conexion.createStatement();
+            stmt.executeUpdate(query);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void ACTUALIZARPLATILLO(){
         try{
-            String query = "UPDATE Carrito SET nomProducto = '"+this.nomProducto+"' "+
-                    "WHERE idProducto = "+this.idProducto;
+            String query = "UPDATE Platillo SET nomPlatillo = '"+this.nomPlatillo+"' "+
+                    "WHERE idPlatillo = "+this.idPlatillo;
             Statement stmt = Conexion.conexion.createStatement();
             stmt.executeUpdate(query);
         }
@@ -117,9 +135,9 @@ public class CategoriasDAO {
         }
     }
 
-    public void ELIMINARPRODUCTO(){
+    public void ELIMINARPLATILLO(){
         try{
-            String query = "DELETE FROM Carrito WHERE idProducto = "+this.idProducto;
+            String query = "DELETE FROM Platillo WHERE idPlatillo = "+this.idPlatillo;
             Statement stmt = Conexion.conexion.createStatement();
             stmt.executeUpdate(query);
         }catch (Exception e){
@@ -127,17 +145,17 @@ public class CategoriasDAO {
         }
     }
 
-    public ObservableList<CategoriasDAO> LISTARPRODUCTOS(){
+    public ObservableList<CategoriasDAO> LISTARPLATILLOS(){
         ObservableList<CategoriasDAO> ListPro = FXCollections.observableArrayList();
         CategoriasDAO objC;
         try{
-            String query = "SELECT * FROM Carrito";
+            String query = "SELECT * FROM Platillo";
             Statement stmt = Conexion.conexion.createStatement();
             ResultSet res = stmt.executeQuery(query);
             while(res.next()){
                 objC = new CategoriasDAO();
-                objC.setIdProducto(res.getInt("idProducto"));
-                objC.setNomProducto(res.getString("nomProducto"));
+                objC.setIdPlatillo(res.getInt("idPlatillo"));
+                objC.setNomPlatillo(res.getString("nomPlatillo"));
                 ListPro.add(objC);
             }
         }catch (Exception e){
@@ -145,7 +163,6 @@ public class CategoriasDAO {
         }
         return ListPro;
     }
-
 
 
 }
