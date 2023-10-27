@@ -3,28 +3,30 @@ package Components;
 import Vistas.CategoriaForm;
 import javafx.scene.control.*;
 import modelos.CategoriasDAO;
+import modelos.TaqueriasDAO;
 
 import java.util.Optional;
 
-public class ButtonCell2 extends TableCell<CategoriasDAO,String> {
+public class ButtonCell2 extends TableCell<TaqueriasDAO,String> {
     private Button btnCelda;
     private int opc;
-    private TableView<CategoriasDAO> tbvProducto;
-    private CategoriasDAO objPro;
+    private TableView<TaqueriasDAO> tbvTaquerias;
+    private TableView<TaqueriasDAO> tbvTaque;
+    private TaqueriasDAO objTaq;
 
     public ButtonCell2(int opc){
         this.opc = opc;
         String txtBtn = this.opc == 1 ? "Editar" : "Eliminar";
         btnCelda=new Button(txtBtn);
-        btnCelda.setOnAction(event -> accionBotonBailey());
+        btnCelda.setOnAction(event -> accionBoton());
     }
 
-    private void accionBotonBailey(){
-        tbvProducto = ButtonCell2.this.getTableView();
-        objPro = tbvProducto.getItems().get(ButtonCell2.this.getIndex());
+    private void accionBoton(){
+        tbvTaquerias = ButtonCell2.this.getTableView();
+        objTaq = tbvTaquerias.getItems().get(ButtonCell2.this.getIndex());
 
         if(this.opc ==1){
-            new CategoriaForm(tbvProducto, objPro);
+            //new CategoriaForm(tbvTaquerias, objCat);
         }else{
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Topicos Avanzados de Programacion");
@@ -32,11 +34,11 @@ public class ButtonCell2 extends TableCell<CategoriasDAO,String> {
             alert.setContentText("¿Deseas eliminar?");
 
             Optional<ButtonType> result = alert.showAndWait();
-
             if(result.get() == ButtonType.OK){
-                objPro.ELIMINARPLATILLO();
-                tbvProducto.setItems(objPro.LISTARPLATILLOS());
-                tbvProducto.refresh();
+                objTaq.ELIMINARPLATILLO();
+                objTaq.ELIMINARPLATILLOTODO();
+                tbvTaquerias.setItems(objTaq.LISTARCATEGORIAS());
+                tbvTaquerias.refresh();
             }
         }
     }

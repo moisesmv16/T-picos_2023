@@ -2,7 +2,7 @@ package Vistas;
 
 import Components.ButtonCell;
 import Components.ButtonCell2;
-import javafx.collections.FXCollections;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -16,28 +16,32 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import modelos.CategoriasDAO;
+import modelos.TaqueriasDAO;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 public class Baileys extends Stage {
     private Scene escena;
-    private HBox hBoxMostrar;
-    private VBox vBox,vBoxTabla,vBoxTablaSugerencia,vBoxSuge;
-    private VBox vBox2,vBox3,vBox4,vBoxPostre1,vBoxPostre2;
-    private VBox vBoxEspe1,vBoxEspe2,vBoxBebi1,vBoxBebi2;
-    private Button btnSugerir,btnCarrito,btnTacos,btnPostres,btnEspecialidad,btnBebidas,btnTacoPastor,btnTacoCabeza,btnTacoCostilla,btnTacoChorizo;
-    private Button btnAlambre,btnCarneAsada,btnPapa,btnVolcanes;
-    private Button btnPay,btnHelado,btnGelatina,btnPastel,btnBurrito;
-    private Button btnCoca,btnAguaNatural,btnAguaLimon,btnPepsi,btnCerveza;
-    //private ObservableList<String> itemsCarrito = FXCollections.observableArrayList();
-    private TableView<CategoriasDAO> tbvProducto;
-    private TableView<CategoriasDAO> tbvCategorias;
-    private Button btnOrdenar,btnSugerencia;
-    private CategoriasDAO categoriasDAO;
-    //private ObservableList<CategoriasDAO> tacosDePastorList = FXCollections.observableArrayList();
-    private int categoriaID;
+    private HBox hBoxMostrar, hBoxUsuarios;
+    private VBox vBox, vBoxTablaPedido,vBoxSuge,vBoxTablaSugerencia;
+    private VBox vBox2, vBox3, vBox4, vBoxPostre1, vBoxPostre2;
+    private VBox vBoxEspe1, vBoxEspe2, vBoxBebi1, vBoxBebi2;
+    private Button btnSugerir, btnCarrito, btnTacos, btnPostres, btnEspecialidad, btnBebidas, btnTacoPastor, btnTacoCabeza, btnTacoCostilla, btnTacoChorizo;
+    private Button btnAlambre, btnCarneAsada, btnPapa, btnVolcanes;
+    private Button btnPay, btnHelado, btnGelatina, btnPastel, btnSesion,btnOrdenar,btnPedir;
+    private Button btnCoca, btnAguaNatural, btnAguaLimon, btnPepsi, btnCerveza, btnBurrito,btnSuge;
 
-    public Baileys(){
+    private TaqueriasDAO taqueriasDAO;
+
+    private Button btnCR7, btnMOY;
+    private TableView<TaqueriasDAO> tbvTaquerias;
+
+    private TableView<TaqueriasDAO> tbvTaque;
+
+
+
+    public Baileys() {
+
         CrearUI();
         Panel panel = new Panel("Menu Principal");//pone el titulo al panel
         panel.getStyleClass().add("panel-primary");//agrega el panel prymary                            //(2)
@@ -47,7 +51,7 @@ public class Baileys extends Stage {
         content.setLeft(vBox);//
         content.setRight(vBox2);
         panel.setBody(content);//carga el contenido
-        escena = new Scene(panel,200,200);
+        escena = new Scene(panel, 200, 200);
         escena.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());//hoja de estilos de bootstrap  //(3)
         escena.getStylesheets().add(getClass().getResource("/Estilos/Baileys.css").toString());
         this.setTitle("BIENVENIDO AL RESTAURANTE BAILEYS...");
@@ -55,23 +59,32 @@ public class Baileys extends Stage {
         this.show();
     }
 
-    private void CrearUI(){
+    private void CrearUI() {
 
-        categoriasDAO = new CategoriasDAO();
-        tbvProducto = new TableView<CategoriasDAO>();
-        CrearTable();
-        btnOrdenar=new Button("Ordenar");
-        btnOrdenar.getStyleClass().setAll("btn","btn-success");
-        btnOrdenar.setOnAction(event -> {LimpiarTabla();});
-        vBoxTabla = new VBox(tbvProducto,btnOrdenar);
+        taqueriasDAO = new TaqueriasDAO();
+        tbvTaquerias = new TableView<TaqueriasDAO>();
+        CrearTabla();
+        btnPedir = new Button("Order");
+        btnPedir.getStyleClass().setAll("btn", "btn-success");
+        btnPedir.setDisable(true); // Deshabilita el botón inicialmente
 
-        categoriasDAO=new CategoriasDAO();
-        tbvCategorias = new TableView<CategoriasDAO>();
-        CrearSuge();
-        btnSugerencia=new Button("sugerir");
-        btnSugerencia.getStyleClass().setAll("btn","btn-success");
-        btnSugerencia.setOnAction(event -> LimpiarTablaSugerencia());
+        btnPedir.setOnAction(event -> {
+            LimpiarTabla();
+        });
 
+        btnOrdenar = new Button("Ver Orden");
+        btnOrdenar.getStyleClass().setAll("btn", "btn-success");
+        btnOrdenar.setOnAction(event -> {
+            actualizarTabla();
+            btnPedir.setDisable(false); // Habilita el botón al presionar btnOrdenar
+        });
+
+        vBoxTablaPedido = new VBox(tbvTaquerias, btnOrdenar, btnPedir);
+
+
+        taqueriasDAO = new TaqueriasDAO();
+        tbvTaque = new TableView<TaqueriasDAO>();
+        Crear();
         Image imgCerveza = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\24.jpg");
         ImageView imvcer = new ImageView(imgCerveza);
         imvcer.setFitWidth(50);
@@ -80,7 +93,9 @@ public class Baileys extends Stage {
         btnCerveza = new Button("Cerveza");
         btnCerveza.setGraphic(imvcer);
         btnCerveza.getStyleClass().setAll("btn","btn-default");
-        btnCerveza.setOnAction(event -> SugerirCerveza());
+        btnCerveza.setOnAction(event -> {
+            AbrirCategoriaCerveza();
+        });
 
         Image imgBurrito = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\25.jpg");
         ImageView imvBurrito = new ImageView(imgBurrito);
@@ -90,14 +105,51 @@ public class Baileys extends Stage {
         btnBurrito = new Button("Burrito");
         btnBurrito.setGraphic(imvBurrito);
         btnBurrito.getStyleClass().setAll("btn","btn-default");
-        btnBurrito.setOnAction(event -> SugerirBurrito());
+        btnBurrito.setOnAction(event -> {
+            AbrirCategoriaBurrito();
+        });
 
         vBoxSuge = new VBox();
         vBoxSuge.setSpacing(35);
         vBoxSuge.getChildren().setAll(btnCerveza,btnBurrito);
 
-        vBoxTablaSugerencia = new VBox(tbvCategorias,btnSugerencia,vBoxSuge);
+        btnSuge=new Button("Agregar");
+        btnSuge.getStyleClass().setAll("btn", "btn-success");
+        btnSuge.setOnAction(event -> {
+            ActualizarTablaCategoria();
+        });
+        vBoxTablaSugerencia = new VBox(tbvTaque,btnSuge,vBoxSuge);
 
+
+        Image imgUsu1 = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\26.jpg");
+        ImageView imvUsu = new ImageView(imgUsu1);
+        imvUsu.setFitWidth(200);
+        imvUsu.setFitHeight(200);
+
+        btnCR7 = new Button(" ");
+        btnCR7.setGraphic(imvUsu);
+        btnCR7.getStyleClass().setAll("btn", "btn-default");
+        btnCR7.setOnAction(event -> {
+            AbrirCR7();
+            BOTONCR7();
+        });
+
+        Image imgUsu2 = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\27.jpg");
+        ImageView imvUsu2 = new ImageView(imgUsu2);
+        imvUsu2.setFitWidth(200);
+        imvUsu2.setFitHeight(200);
+
+        btnMOY = new Button(" ");
+        btnMOY.setGraphic(imvUsu2);
+        btnMOY.getStyleClass().setAll("btn", "btn-default");
+        btnMOY.setOnAction(event -> {
+            AbrirHasbu();
+            BOTONHASBU();
+        });
+
+        hBoxUsuarios = new HBox();
+        hBoxUsuarios.setSpacing(35);
+        hBoxUsuarios.getChildren().setAll(btnCR7, btnMOY);
 
 
         Image imgTaco = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\1.jpg");
@@ -107,10 +159,10 @@ public class Baileys extends Stage {
 
         btnTacos = new Button("Tacos");
         btnTacos.setGraphic(imv);
-        btnTacos.getStyleClass().setAll("btn","btn-default");
+        btnTacos.getStyleClass().setAll("btn", "btn-default");
         btnTacos.setOnAction(event -> {
             AbrirTacos();
-            CategoriaTacos();
+            AbrirCategoria();
         });
 
         Image imgPostres = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\2.jpg");
@@ -120,12 +172,15 @@ public class Baileys extends Stage {
 
         btnPostres = new Button("Postres");
         btnPostres.setGraphic(imv1);
-        btnPostres.getStyleClass().setAll("btn","btn-default");
-        btnPostres.setOnAction(event -> AbrirPostres());
+        btnPostres.getStyleClass().setAll("btn", "btn-default");
+        btnPostres.setOnAction(event -> {
+            AbrirPostres();
+            AbrirCategoriaPostres();
+        });
 
         vBox = new VBox();
         vBox.setSpacing(35);
-        vBox.getChildren().setAll(btnTacos,btnPostres);
+        vBox.getChildren().setAll(btnTacos, btnPostres);
 
         Image imgEspecialidad = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\3.jpg");
         ImageView imv2 = new ImageView(imgEspecialidad);
@@ -134,8 +189,11 @@ public class Baileys extends Stage {
 
         btnEspecialidad = new Button("Especialidades");
         btnEspecialidad.setGraphic(imv2);
-        btnEspecialidad.getStyleClass().setAll("btn","btn-default");
-        btnEspecialidad.setOnAction(event -> AbrirEspecialidad());
+        btnEspecialidad.getStyleClass().setAll("btn", "btn-default");
+        btnEspecialidad.setOnAction(event -> {
+            AbrirEspecialidad();
+            AbrirCategoriaEspecialidad();
+        });
 
         Image imgBebidas = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\4.jpg");
         ImageView imv3 = new ImageView(imgBebidas);
@@ -144,12 +202,15 @@ public class Baileys extends Stage {
 
         btnBebidas = new Button("Bebidas");
         btnBebidas.setGraphic(imv3);
-        btnBebidas.getStyleClass().setAll("btn","btn-default");
-        btnBebidas.setOnAction(event -> AbrirBebidas());
+        btnBebidas.getStyleClass().setAll("btn", "btn-default");
+        btnBebidas.setOnAction(event -> {
+            AbrirBebidas();
+            AbrirCategoriaBebidas();
+        });
 
         vBox2 = new VBox();
         vBox2.setSpacing(35);
-        vBox2.getChildren().setAll(btnEspecialidad,btnBebidas);
+        vBox2.getChildren().setAll(btnEspecialidad, btnBebidas);
 
         Image imgCarrito = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\21.jpg");
         ImageView imvcarrito = new ImageView(imgCarrito);
@@ -158,8 +219,11 @@ public class Baileys extends Stage {
 
         btnCarrito = new Button("");
         btnCarrito.setGraphic(imvcarrito);
-        btnCarrito.getStyleClass().setAll("btn","btn-default");
-        btnCarrito.setOnAction(event -> Carrito());
+        btnCarrito.getStyleClass().setAll("btn", "btn-default");
+        btnCarrito.setOnAction(event -> {
+            Carrito();
+            AsignarTicket();
+        });
 
         Image imgSuge = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\23.jpg");
         ImageView imvSuge = new ImageView(imgSuge);
@@ -168,13 +232,25 @@ public class Baileys extends Stage {
 
         btnSugerir = new Button("");
         btnSugerir.setGraphic(imvSuge);
-        btnSugerir.getStyleClass().setAll("btn","btn-default");
+        btnSugerir.getStyleClass().setAll("btn", "btn-default");
         btnSugerir.setOnAction(event -> Sugerencia());
+
+        Image imgSesion = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\22.jpg");
+        ImageView imvSesion = new ImageView(imgSesion);
+        imvSesion.setFitWidth(50);
+        imvSesion.setFitHeight(50);
+
+        btnSesion = new Button("");
+        btnSesion.setGraphic(imvSesion);
+        btnSesion.getStyleClass().setAll("btn", "btn-default");
+        btnSesion.setOnAction(event -> {
+            Sesion();
+        });
 
 
         hBoxMostrar = new HBox();
         hBoxMostrar.setSpacing(50);
-        hBoxMostrar.getChildren().setAll(btnCarrito,btnSugerir);
+        hBoxMostrar.getChildren().setAll(btnCarrito, btnSugerir, btnSesion);
 
 
         //tacos
@@ -184,11 +260,11 @@ public class Baileys extends Stage {
         imv4.setFitWidth(200);
         imv4.setFitHeight(200);
 
-        btnTacoPastor=new Button("Tacos de pastor");
+        btnTacoPastor = new Button("Tacos de pastor");
         btnTacoPastor.setGraphic(imv4);
-        btnTacoPastor.getStyleClass().setAll("btn","btn-default");
-        btnTacoPastor.setOnAction(event ->{
-            AgregarTacoPastor();
+        btnTacoPastor.getStyleClass().setAll("btn", "btn-default");
+        btnTacoPastor.setOnAction(event -> {
+            AsignarTaco();
         });
 
         Image imgTacosCabeza = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\6.jpg");
@@ -196,27 +272,27 @@ public class Baileys extends Stage {
         imv5.setFitWidth(200);
         imv5.setFitHeight(200);
 
-        btnTacoCabeza=new Button("Tacos de cabeza");
+        btnTacoCabeza = new Button("Tacos de cabeza");
         btnTacoCabeza.setGraphic(imv5);
-        btnTacoCabeza.getStyleClass().setAll("btn","btn-default");
+        btnTacoCabeza.getStyleClass().setAll("btn", "btn-default");
         btnTacoCabeza.setOnAction(event -> {
-           // AgregarTacoCabeza();
+            AsignarTacoCabeza();
         });
 
-        vBox3=new VBox();
+        vBox3 = new VBox();
         vBox3.setSpacing(35);
-        vBox3.getChildren().setAll(btnTacoPastor,btnTacoCabeza);
+        vBox3.getChildren().setAll(btnTacoPastor, btnTacoCabeza);
 
         Image imgTacosCostilla = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\7.jpg");
         ImageView imv6 = new ImageView(imgTacosCostilla);
         imv6.setFitWidth(200);
         imv6.setFitHeight(200);
 
-        btnTacoCostilla=new Button("Tacos de costilla");
+        btnTacoCostilla = new Button("Tacos de costilla");
         btnTacoCostilla.setGraphic(imv6);
-        btnTacoCostilla.getStyleClass().setAll("btn","btn-default");
+        btnTacoCostilla.getStyleClass().setAll("btn", "btn-default");
         btnTacoCostilla.setOnAction(event -> {
-           // AgregarTacoCostilla();
+            AsignarTacoCostilla();
         });
 
         Image imgTacosChorizo = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\8.jpg");
@@ -224,16 +300,16 @@ public class Baileys extends Stage {
         imv7.setFitWidth(200);
         imv7.setFitHeight(200);
 
-        btnTacoChorizo=new Button("Tacos de chorizo");
+        btnTacoChorizo = new Button("Tacos de chorizo");
         btnTacoChorizo.setGraphic(imv7);
-        btnTacoChorizo.getStyleClass().setAll("btn","btn-default");
+        btnTacoChorizo.getStyleClass().setAll("btn", "btn-default");
         btnTacoChorizo.setOnAction(event -> {
-           // AgregarTacoChorizo();
+            AsignarTacoChorizo();
         });
 
-        vBox4=new VBox();
+        vBox4 = new VBox();
         vBox4.setSpacing(35);
-        vBox4.getChildren().setAll(btnTacoCostilla,btnTacoChorizo);
+        vBox4.getChildren().setAll(btnTacoCostilla, btnTacoChorizo);
 
         //Postres
 
@@ -245,9 +321,9 @@ public class Baileys extends Stage {
 
         btnPay = new Button("Pay");
         btnPay.setGraphic(imv8);
-        btnPay.getStyleClass().setAll("btn","btn-default");
+        btnPay.getStyleClass().setAll("btn", "btn-default");
         btnPay.setOnAction(event -> {
-          //  AgregarPay();
+            AsignarPay();
         });
 
         Image imgHelado = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\10.jpg");
@@ -255,27 +331,27 @@ public class Baileys extends Stage {
         imv9.setFitWidth(200);
         imv9.setFitHeight(200);
 
-        btnHelado=new Button("Helado");
+        btnHelado = new Button("Helado");
         btnHelado.setGraphic(imv9);
-        btnHelado.getStyleClass().setAll("btn","btn-default");
+        btnHelado.getStyleClass().setAll("btn", "btn-default");
         btnHelado.setOnAction(event -> {
-            //AgregarHelado();
+            AsignarHelado();
         });
 
-        vBoxPostre1=new VBox();
+        vBoxPostre1 = new VBox();
         vBoxPostre1.setSpacing(35);
-        vBoxPostre1.getChildren().setAll(btnPay,btnHelado);
+        vBoxPostre1.getChildren().setAll(btnPay, btnHelado);
 
         Image imgGelatina = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\11.jpg");
         ImageView imv10 = new ImageView(imgGelatina);
         imv10.setFitWidth(200);
         imv10.setFitHeight(200);
 
-        btnGelatina=new Button("Gelatina");
+        btnGelatina = new Button("Gelatina");
         btnGelatina.setGraphic(imv10);
-        btnGelatina.getStyleClass().setAll("btn","btn-default");
+        btnGelatina.getStyleClass().setAll("btn", "btn-default");
         btnGelatina.setOnAction(event -> {
-            //AgregarGelatina();
+            AsignarGelatina();
         });
 
         Image imgPastel = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\12.jpg");
@@ -283,16 +359,16 @@ public class Baileys extends Stage {
         imv11.setFitWidth(200);
         imv11.setFitHeight(200);
 
-        btnPastel=new Button("Pastel");
+        btnPastel = new Button("Pastel");
         btnPastel.setGraphic(imv11);
-        btnPastel.getStyleClass().setAll("btn","btn-default");
+        btnPastel.getStyleClass().setAll("btn", "btn-default");
         btnPastel.setOnAction(event -> {
-            //AgregarPastel();
+            AsignarPastel();
         });
 
-        vBoxPostre2=new VBox();
+        vBoxPostre2 = new VBox();
         vBoxPostre2.setSpacing(35);
-        vBoxPostre2.getChildren().setAll(btnGelatina,btnPastel);
+        vBoxPostre2.getChildren().setAll(btnGelatina, btnPastel);
 
         //Especialidades
 
@@ -301,11 +377,11 @@ public class Baileys extends Stage {
         imv12.setFitWidth(200);
         imv12.setFitHeight(200);
 
-        btnAlambre=new Button("Alambre");
+        btnAlambre = new Button("Alambre");
         btnAlambre.setGraphic(imv12);
-        btnAlambre.getStyleClass().setAll("btn","btn-default");
+        btnAlambre.getStyleClass().setAll("btn", "btn-default");
         btnAlambre.setOnAction(event -> {
-            //AgregarAlambre();
+            AsignarAlambre();
         });
 
         Image imgAsada = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\14.jpg");
@@ -313,27 +389,27 @@ public class Baileys extends Stage {
         imv13.setFitWidth(200);
         imv13.setFitHeight(200);
 
-        btnCarneAsada=new Button("Carne asada");
+        btnCarneAsada = new Button("Carne asada");
         btnCarneAsada.setGraphic(imv13);
-        btnCarneAsada.getStyleClass().setAll("btn","btn-default");
+        btnCarneAsada.getStyleClass().setAll("btn", "btn-default");
         btnCarneAsada.setOnAction(event -> {
-           // AgregarAsada();
+            AsignarAsada();
         });
 
-        vBoxEspe1=new VBox();
+        vBoxEspe1 = new VBox();
         vBoxEspe1.setSpacing(35);
-        vBoxEspe1.getChildren().setAll(btnAlambre,btnCarneAsada);
+        vBoxEspe1.getChildren().setAll(btnAlambre, btnCarneAsada);
 
         Image imgPapa = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\15.jpg");
         ImageView imv14 = new ImageView(imgPapa);
         imv14.setFitWidth(200);
         imv14.setFitHeight(200);
 
-        btnPapa=new Button("Papa rellena");
+        btnPapa = new Button("Papa rellena");
         btnPapa.setGraphic(imv14);
-        btnPapa.getStyleClass().setAll("btn","btn-default");
+        btnPapa.getStyleClass().setAll("btn", "btn-default");
         btnPapa.setOnAction(event -> {
-           // AgregarPapa();
+            AsignarPapa();
         });
 
         Image imgVolcan = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\16.jpg");
@@ -341,16 +417,16 @@ public class Baileys extends Stage {
         imv15.setFitWidth(200);
         imv15.setFitHeight(200);
 
-        btnVolcanes=new Button("Volcanes");
+        btnVolcanes = new Button("Volcanes");
         btnVolcanes.setGraphic(imv15);
-        btnVolcanes.getStyleClass().setAll("btn","btn-default");
+        btnVolcanes.getStyleClass().setAll("btn", "btn-default");
         btnVolcanes.setOnAction(event -> {
-            //AgregarVolcanes();
+            AsignarVolcanes();
         });
 
-        vBoxEspe2=new VBox();
+        vBoxEspe2 = new VBox();
         vBoxEspe2.setSpacing(35);
-        vBoxEspe2.getChildren().setAll(btnPapa,btnVolcanes);
+        vBoxEspe2.getChildren().setAll(btnPapa, btnVolcanes);
 
         //bebidas
 
@@ -359,11 +435,11 @@ public class Baileys extends Stage {
         imv16.setFitWidth(200);
         imv16.setFitHeight(200);
 
-        btnCoca=new Button("Coca");
+        btnCoca = new Button("Coca");
         btnCoca.setGraphic(imv16);
-        btnCoca.getStyleClass().setAll("btn","btn-default");
+        btnCoca.getStyleClass().setAll("btn", "btn-default");
         btnCoca.setOnAction(event -> {
-            //AgregarCoca();
+            AsignarCoca();
         });
 
         Image imgAguaNatural = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\18.jpg");
@@ -371,27 +447,27 @@ public class Baileys extends Stage {
         imv17.setFitWidth(200);
         imv17.setFitHeight(200);
 
-        btnAguaNatural=new Button("Agua");
+        btnAguaNatural = new Button("Agua");
         btnAguaNatural.setGraphic(imv17);
-        btnAguaNatural.getStyleClass().setAll("btn","btn-default");
+        btnAguaNatural.getStyleClass().setAll("btn", "btn-default");
         btnAguaNatural.setOnAction(event -> {
-            //AgregarAgua();
+            AsignarAgua();
         });
 
-        vBoxBebi1=new VBox();
+        vBoxBebi1 = new VBox();
         vBoxBebi1.setSpacing(35);
-        vBoxBebi1.getChildren().setAll(btnCoca,btnAguaNatural);
+        vBoxBebi1.getChildren().setAll(btnCoca, btnAguaNatural);
 
         Image imgAguaLimon = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\19.jpg");
         ImageView imv18 = new ImageView(imgAguaLimon);
         imv18.setFitWidth(200);
         imv18.setFitHeight(200);
 
-        btnAguaLimon=new Button("Agua Limon");
+        btnAguaLimon = new Button("Agua Limon");
         btnAguaLimon.setGraphic(imv18);
-        btnAguaLimon.getStyleClass().setAll("btn","btn-default");
+        btnAguaLimon.getStyleClass().setAll("btn", "btn-default");
         btnAguaLimon.setOnAction(event -> {
-            //AgregarAguaLimon();
+            AsignarLimon();
         });
 
         Image imgPepsi = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\20.jpg");
@@ -399,82 +475,21 @@ public class Baileys extends Stage {
         imv19.setFitWidth(200);
         imv19.setFitHeight(200);
 
-        btnPepsi=new Button("Pepsi");
+        btnPepsi = new Button("Pepsi");
         btnPepsi.setGraphic(imv19);
-        btnPepsi.getStyleClass().setAll("btn","btn-default");
+        btnPepsi.getStyleClass().setAll("btn", "btn-default");
         btnPepsi.setOnAction(event -> {
-           // AgregarPepsi();
+            AsignarPepsi();
         });
 
-        vBoxBebi2=new VBox();
+        vBoxBebi2 = new VBox();
         vBoxBebi2.setSpacing(35);
-        vBoxBebi2.getChildren().setAll(btnAguaLimon,btnPepsi);
+        vBoxBebi2.getChildren().setAll(btnAguaLimon, btnPepsi);
 
 
     }
 
-    public  void CrearTable(){
-        TableColumn<CategoriasDAO,Integer> tbcCarrito = new TableColumn<>("ID");
-        tbcCarrito.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
-
-        TableColumn<CategoriasDAO,String> tbcNomPro = new TableColumn<>("Producto");
-        tbcNomPro.setCellValueFactory(new PropertyValueFactory<>("nomProducto"));
-
-        TableColumn<CategoriasDAO,String> tbcEliminar = new TableColumn<>("Eliminar");
-        tbcEliminar.setCellFactory(
-                new Callback<TableColumn<CategoriasDAO, String>, TableCell<CategoriasDAO, String>>() {
-                    @Override
-                    public TableCell<CategoriasDAO, String> call(TableColumn<CategoriasDAO, String> categoriasDAOStringTableColumn) {
-                        return new ButtonCell2(2);
-                    }
-                }
-        );
-        tbvProducto.getColumns().addAll(tbcCarrito,tbcNomPro,tbcEliminar);
-        tbvProducto.setItems(categoriasDAO.LISTARPLATILLOS());
-    }
-
-    public void CrearSuge(){
-        TableColumn<CategoriasDAO,Integer> tbcldCat = new TableColumn<>("ID");
-        tbcldCat.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
-
-        TableColumn<CategoriasDAO,String> tbcNomCat = new TableColumn<>("Categoria");
-        tbcNomCat.setCellValueFactory(new PropertyValueFactory<>("nomCategoria"));
-
-        TableColumn<CategoriasDAO,String> tbcEliminar = new TableColumn<>("Eliminar");
-        tbcEliminar.setCellFactory(
-                new Callback<TableColumn<CategoriasDAO, String>, TableCell<CategoriasDAO, String>>() {
-                    @Override
-                    public TableCell<CategoriasDAO, String> call(TableColumn<CategoriasDAO, String> categoriasDAOStringTableColumn) {
-                        return new ButtonCell(2);
-                    }
-                }
-        );
-        tbvCategorias.getColumns().addAll(tbcldCat,tbcNomCat,tbcEliminar);
-        tbvCategorias.setItems(categoriasDAO.LISTARCATEGORIAS());
-    }
-    private void LimpiarTabla(){
-        tbvProducto.getItems().clear();
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Compra Exitosa");
-        alert.setHeaderText(null);
-        alert.setContentText("Gracias por su compra");
-        alert.getButtonTypes().setAll(ButtonType.OK);
-        alert.showAndWait();
-    }
-
-    private void LimpiarTablaSugerencia(){
-        tbvCategorias.getItems().clear();
-        btnCerveza.setDisable(false);
-        btnBurrito.setDisable(false);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Registro Exitoso");
-        alert.setHeaderText(null);
-        alert.setContentText("Gracias por su Sugerencia");
-        alert.getButtonTypes().setAll(ButtonType.OK);
-        alert.showAndWait();
-    }
-
-    private void AbrirTacos(){
+    private void AbrirTacos() {
         Stage nuevaVentana = new Stage();
         Panel panel = new Panel("Menu de Tacos...");
         panel.getStyleClass().setAll("panel-primary");
@@ -493,7 +508,7 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    private void AbrirPostres(){
+    private void AbrirPostres() {
         Stage nuevaVentana = new Stage();
         Panel panel = new Panel("Menu de Postres...");
         panel.getStyleClass().setAll("panel-primary");
@@ -512,7 +527,7 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    private void AbrirEspecialidad(){
+    private void AbrirEspecialidad() {
         Stage nuevaVentana = new Stage();
         Panel panel = new Panel("Menu de Especialidades de la casa...");
         panel.getStyleClass().setAll("panel-primary");
@@ -531,7 +546,7 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    private void AbrirBebidas(){
+    private void AbrirBebidas() {
         Stage nuevaVentana = new Stage();
         Panel panel = new Panel("Menu de Bebidas...");
         panel.getStyleClass().setAll("panel-primary");
@@ -556,7 +571,7 @@ public class Baileys extends Stage {
         panel.getStyleClass().setAll("panel-primary");
         BorderPane content = new BorderPane();
         content.setPadding(new Insets(20));
-        content.setCenter(vBoxTabla);
+        content.setCenter(vBoxTablaPedido);
         panel.setBody(content);
 
         Scene nuevaEscena = new Scene(panel, 400, 400);
@@ -567,7 +582,7 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    private void Sugerencia(){
+    private void Sugerencia() {
         Stage nuevaVentana = new Stage();
         Panel panel = new Panel("Sugerencia de Platillos nuevos");
         panel.getStyleClass().setAll("panel-primary");
@@ -584,254 +599,239 @@ public class Baileys extends Stage {
         nuevaVentana.show();
     }
 
-    public void CategoriaTacos(){
-        CategoriasDAO agregar = new CategoriasDAO();
-        agregar.setNomCategoria("Tacos");
-        agregar.INSERTARCATEGORIAS();
-        categoriaID = agregar.getIdCategoria(); // Obtener el ID después de insertar la categoría
-        //tbvCategorias.setItems(agregar.LISTARCATEGORIAS());
-        //tbvCategorias.refresh();
+    private void Sesion() {
+        Stage nuevaVentana = new Stage();
+        Panel panel = new Panel("Inicio de Sesion");
+        panel.getStyleClass().setAll("panel-primary");
+        BorderPane content = new BorderPane();
+        content.setPadding(new Insets(20));
+        content.setCenter(hBoxUsuarios);
+        panel.setBody(content);
+
+        Scene nuevaEscena = new Scene(panel, 400, 400);
+        nuevaEscena.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
+        nuevaVentana.setTitle("Escoga su usuario");
+        nuevaVentana.setScene(nuevaEscena);
+        nuevaVentana.setOnCloseRequest(event -> nuevaVentana.close());
+        nuevaVentana.show();
     }
 
-    public void AgregarTacoPastor(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomPlatillo("Taco de Pastor");
-        pedido.setprecio(8);
-        pedido.setimagen("5.jpg");
+    private int idCategoria = -1;
+    private int idPedido = -1;
+    private int idPlatillo = -1;
+    private int Total = 0;
 
-        pedido.setIdCategoria(categoriaID);
+    private void AbrirCategoria() {
+        idCategoria = taqueriasDAO.insertarCategoria("Tacos");
+    }
 
-        pedido.INSERTARPLATILLO();
+    private void AbrirCategoriaPostres() {
+        idCategoria = taqueriasDAO.insertarCategoria("Postres");
+    }
 
-        int ProductID = pedido.getIdPlatillo();
+    private void AbrirCategoriaEspecialidad() {
+        idCategoria = taqueriasDAO.insertarCategoria("Volcanes");
+    }
 
-        if (ProductID > 0){
-            pedido.setIdPlatillo(ProductID);
+    private void AbrirCategoriaBebidas() {
+        idCategoria = taqueriasDAO.insertarCategoria("Bebidas");
+    }
+
+    private void AsignarTaco() {
+        if (idCategoria != -1) {
+            // Si se obtiene un id de categoría válido, insertar un platillo asociado a esa categoría
+            idPlatillo = taqueriasDAO.insertarPlatillo("Tacos de Pastor", 15, "ImagenesTaqueria/5.jpg", idCategoria);
         }
-        //tbvProducto.setItems(pedido.LISTARPLATILLOS());
-        //tbvProducto.refresh();
     }
-/*
-    public void AgregarTacoCabeza(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Taco de Cabeza");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
 
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarTacoCabeza() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Tacos de Cabeza", 15, "ImagenesTaqueria/6.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarTacoCostilla(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Taco de Costilla");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarTacoCostilla() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Tacos de Costilla", 15, "ImagenesTaqueria/7.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarTacoChorizo(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Taco de Chorizo");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarTacoChorizo() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Tacos de Chorizo", 15, "ImagenesTaqueria/8.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarPay(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Rebanada de pay");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarPay() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Rebanada de Pay", 40, "ImagenesTaqueria/9.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarHelado(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Helado individual");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarHelado() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Helado Individual", 50, "ImagenesTaqueria/10.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarGelatina(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Gelatina individual");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarGelatina() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Gelatina Individual", 25, "ImagenesTaqueria/11.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarPastel(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Rebanada de Pastel");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarPastel() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Rebanada de Pastel", 50, "ImagenesTaqueria/12.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarAlambre(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Un Alambre Especial");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarAlambre() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Orden de Alambre", 90, "ImagenesTaqueria/13.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarAsada(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Plato de Carne Asada");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarAsada() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Orden de Carne Asada", 120, "ImagenesTaqueria/14.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarPapa(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Papa de pastor");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarPapa() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Papa rellena de pastor", 80, "ImagenesTaqueria/15.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
-
     }
 
-    public void AgregarVolcanes(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("Orden de 4 Alambres");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarVolcanes() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Papa rellena de pastor", 80, "ImagenesTaqueria/16.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarCoca(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("una Coca Cola");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarCoca() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Coca-Cola 600ml", 30, "ImagenesTaqueria/17.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
 
-    public void AgregarAgua(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("una Agua Natural");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
-
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarAgua() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Agua Natural 600ml", 20, "ImagenesTaqueria/18.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
-    public void AgregarAguaLimon(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("una Agua de limon");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
 
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarLimon() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Agua de Limon 600ml", 25, "ImagenesTaqueria/19.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
-
     }
-    public void AgregarPepsi(){
-        CategoriasDAO pedido = new CategoriasDAO();
-        pedido.setNomProducto("una Pepsi");
-        pedido.INSERTARPRODUCTO();
-        int ProductID = pedido.getIdProducto();
 
-        if(ProductID > 0){
-            pedido.setIdProducto(ProductID);
+    private void AsignarPepsi() {
+        if (idCategoria != -1) {
+            idPlatillo = taqueriasDAO.insertarPlatillo("Pepsi 600ml", 30, "ImagenesTaqueria/20.jpg", idCategoria);
         }
-        tbvProducto.setItems(pedido.LISTARPRODUCTOS());
-        tbvProducto.refresh();
     }
-*/
-    public void SugerirCerveza(){
-        CategoriasDAO sugerir = new CategoriasDAO();
-        sugerir.setNomCategoria("Bebidas");
-        sugerir.INSERTAR();
-        int ProductID = sugerir.getIdCategoria();
 
-        if(ProductID > 0){
-            sugerir.setIdCategoria(ProductID);
+    private void AbrirCR7() {
+        idPedido = taqueriasDAO.insertarUsuario("Cristiano Ronaldo");
+    }
+
+    private void BOTONCR7() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Información");
+        alert.setHeaderText(null);
+        alert.setContentText("Bienvenido Cristiano Ronaldo");
+
+        alert.showAndWait();
+
+        btnCR7.setDisable(true);
+        btnMOY.setDisable(true);
+    }
+
+    private void AbrirHasbu() {
+        idPedido = taqueriasDAO.insertarUsuario("Hasbullah Magomedov");
+    }
+
+    private void BOTONHASBU() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Información");
+        alert.setHeaderText(null);
+        alert.setContentText("Bienvenido Hasbullah Magomedov");
+
+        alert.showAndWait();
+
+        btnCR7.setDisable(true);
+        btnMOY.setDisable(true);
+    }
+
+    public void AsignarTicket() {
+        if (idPlatillo != -1 && idPedido != -1) {
+            int valorContador = taqueriasDAO.obtenerContadorInserciones(); // Obtén el valor del contador
+            int sumaTodo = taqueriasDAO.obtenerSuma();
+            taqueriasDAO.insertarCompra(idPlatillo, idPedido, 12, sumaTodo, valorContador); // Pasa el valor del contador
         }
-        tbvCategorias.setItems(sugerir.LISTARCATEGORIAS());
-        tbvCategorias.refresh();
-        btnCerveza.setDisable(true);
     }
 
-    public void SugerirBurrito(){
-        CategoriasDAO sugerir = new CategoriasDAO();
-        sugerir.setNomCategoria("Especialidades");
-        sugerir.INSERTAR();
-        int ProductID = sugerir.getIdCategoria();
+    private void CrearTabla(){
+        TableColumn<TaqueriasDAO,Integer> tbcldCat = new TableColumn<>("ID DE PLATILLO");
+        tbcldCat.setCellValueFactory(new PropertyValueFactory<>("idPlatillo"));
 
-        if(ProductID > 0){
-            sugerir.setIdCategoria(ProductID);
-        }
-        tbvCategorias.setItems(sugerir.LISTARCATEGORIAS());
-        tbvCategorias.refresh();
-        btnBurrito.setDisable(true);
+        TableColumn<TaqueriasDAO,String> tbcldCat2 = new TableColumn<>("Nombre");
+        tbcldCat2.setCellValueFactory(new PropertyValueFactory<>("nombrePlatillo"));
+        tbcldCat2.setEditable(true);
+        tbcldCat2.setPrefWidth(200);
+
+        TableColumn<TaqueriasDAO,String> borrar = new TableColumn<>("Borrar");
+        borrar.setCellFactory(
+                new Callback<TableColumn<TaqueriasDAO, String>, TableCell<TaqueriasDAO, String>>() {
+                    @Override
+                    public TableCell<TaqueriasDAO, String> call(TableColumn<TaqueriasDAO, String> taqueriasDAOStringTableColumn) {
+                        return new ButtonCell2(2);
+                    }
+                }
+        );
+
+
+        tbvTaquerias.getColumns().addAll(tbcldCat,tbcldCat2,borrar);
     }
+
+    private void Crear(){
+        TableColumn<TaqueriasDAO,Integer> Categoria = new TableColumn<>("ID Categoria");
+        Categoria.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
+        TableColumn<TaqueriasDAO, String> nom = new TableColumn<>("Categoria");
+        nom.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+
+        tbvTaque.getColumns().addAll(Categoria,nom);
+    }
+
+    private void actualizarTabla() {
+        tbvTaquerias.getItems().setAll(taqueriasDAO.LISTARPRODUCTOS());
+    }
+
+
+    private void AbrirCategoriaCerveza() {
+        idCategoria = taqueriasDAO.insertarCategoria("Bebidas");
+    }
+    private void AbrirCategoriaBurrito() {
+        idCategoria = taqueriasDAO.insertarCategoria("Especialidades");
+    }
+
+    private void ActualizarTablaCategoria(){
+        tbvTaque.getItems().setAll(taqueriasDAO.LISTARCATEGORIAS());
+    }
+
+    private void LimpiarTabla(){
+        tbvTaquerias.getItems().clear();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Compra Exitosa");
+        alert.setHeaderText(null);
+        alert.setContentText("Gracias por su compra");
+        alert.getButtonTypes().setAll(ButtonType.OK);
+        alert.showAndWait();
+        taqueriasDAO.eliminarTodo();
+        Platform.exit();
+    }
+
 }
