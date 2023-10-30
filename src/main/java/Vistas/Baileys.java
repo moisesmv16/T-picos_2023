@@ -2,6 +2,7 @@ package Vistas;
 
 import Components.ButtonCell;
 import Components.ButtonCell2;
+import Components.ButtonCell3;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -27,7 +28,7 @@ public class Baileys extends Stage {
     private VBox vBox2, vBox3, vBox4, vBoxPostre1, vBoxPostre2;
     private VBox vBoxEspe1, vBoxEspe2, vBoxBebi1, vBoxBebi2;
     private Button btnSugerir, btnCarrito, btnTacos, btnPostres, btnEspecialidad, btnBebidas, btnTacoPastor, btnTacoCabeza, btnTacoCostilla, btnTacoChorizo;
-    private Button btnAlambre, btnCarneAsada, btnPapa, btnVolcanes;
+    private Button btnAlambre, btnCarneAsada, btnPapa, btnVolcanes,btnAcabarSugerencia;
     private Button btnPay, btnHelado, btnGelatina, btnPastel, btnSesion,btnOrdenar,btnPedir;
     private Button btnCoca, btnAguaNatural, btnAguaLimon, btnPepsi, btnCerveza, btnBurrito,btnSuge;
 
@@ -64,7 +65,7 @@ public class Baileys extends Stage {
         taqueriasDAO = new TaqueriasDAO();
         tbvTaquerias = new TableView<TaqueriasDAO>();
         CrearTabla();
-        btnPedir = new Button("Order");
+        btnPedir = new Button("Ordenar Ya");
         btnPedir.getStyleClass().setAll("btn", "btn-success");
         btnPedir.setDisable(true); // Deshabilita el botón inicialmente
 
@@ -72,11 +73,12 @@ public class Baileys extends Stage {
             LimpiarTabla();
         });
 
-        btnOrdenar = new Button("Ver Orden");
+        btnOrdenar = new Button("Actualizar Orden");
         btnOrdenar.getStyleClass().setAll("btn", "btn-success");
         btnOrdenar.setOnAction(event -> {
             actualizarTabla();
             btnPedir.setDisable(false); // Habilita el botón al presionar btnOrdenar
+            btnOrdenar.setDisable(true);
         });
 
         vBoxTablaPedido = new VBox(tbvTaquerias, btnOrdenar, btnPedir);
@@ -118,7 +120,14 @@ public class Baileys extends Stage {
         btnSuge.setOnAction(event -> {
             ActualizarTablaCategoria();
         });
-        vBoxTablaSugerencia = new VBox(tbvTaque,btnSuge,vBoxSuge);
+
+        btnAcabarSugerencia=new Button("Terminar");
+        btnAcabarSugerencia.getStyleClass().setAll("btn", "btn-success");
+        btnAcabarSugerencia.setOnAction(event -> {
+            LimpiarSuge();
+        });
+
+        vBoxTablaSugerencia = new VBox(tbvTaque,btnSuge,btnAcabarSugerencia,vBoxSuge);
 
 
         Image imgUsu1 = new Image("C:\\Users\\Hp\\IdeaProjects\\Topicos\\src\\main\\resources\\ImagenesTaqueria\\26.jpg");
@@ -770,7 +779,7 @@ public class Baileys extends Stage {
         if (idPlatillo != -1 && idPedido != -1) {
             int valorContador = taqueriasDAO.obtenerContadorInserciones(); // Obtén el valor del contador
             int sumaTodo = taqueriasDAO.obtenerSuma();
-            taqueriasDAO.insertarCompra(idPlatillo, idPedido, 12, sumaTodo, valorContador); // Pasa el valor del contador
+            taqueriasDAO.insertarCompra(idPlatillo, idPedido, 0, sumaTodo, valorContador); // Pasa el valor del contador
         }
     }
 
@@ -783,6 +792,14 @@ public class Baileys extends Stage {
         tbcldCat2.setEditable(true);
         tbcldCat2.setPrefWidth(200);
 
+        TableColumn<TaqueriasDAO,String> tbcldCat3 = new TableColumn<>("Imagen");
+        tbcldCat3.setCellValueFactory(new PropertyValueFactory<>("imagenPlatillo"));
+        tbcldCat3.setPrefWidth(300);
+
+        TableColumn<TaqueriasDAO,String> tbcldCat4 = new TableColumn<>("Precio Platillo");
+        tbcldCat4.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        tbcldCat4.setPrefWidth(100);
+
         TableColumn<TaqueriasDAO,String> borrar = new TableColumn<>("Borrar");
         borrar.setCellFactory(
                 new Callback<TableColumn<TaqueriasDAO, String>, TableCell<TaqueriasDAO, String>>() {
@@ -794,7 +811,8 @@ public class Baileys extends Stage {
         );
 
 
-        tbvTaquerias.getColumns().addAll(tbcldCat,tbcldCat2,borrar);
+        tbvTaquerias.getColumns().addAll(tbcldCat,tbcldCat2,tbcldCat3,tbcldCat4,borrar);
+        tbvTaquerias.setItems(taqueriasDAO.LISTARPRODUCTOS());
     }
 
     private void Crear(){
@@ -802,8 +820,18 @@ public class Baileys extends Stage {
         Categoria.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
         TableColumn<TaqueriasDAO, String> nom = new TableColumn<>("Categoria");
         nom.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        TableColumn<TaqueriasDAO,String> borrar = new TableColumn<>("Borrar");
+        borrar.setCellFactory(
+                new Callback<TableColumn<TaqueriasDAO, String>, TableCell<TaqueriasDAO, String>>() {
+                    @Override
+                    public TableCell<TaqueriasDAO, String> call(TableColumn<TaqueriasDAO, String> taqueriasDAOStringTableColumn) {
+                        return new ButtonCell3(2);
+                    }
+                }
+        );
 
-        tbvTaque.getColumns().addAll(Categoria,nom);
+        tbvTaque.getColumns().addAll(Categoria,nom,borrar);
+        tbvTaque.setItems(taqueriasDAO.LISTARCATEGORIAS());
     }
 
     private void actualizarTabla() {
@@ -823,15 +851,35 @@ public class Baileys extends Stage {
     }
 
     private void LimpiarTabla(){
+        ObservableList<TaqueriasDAO> Lista = tbvTaquerias.getItems();
+
+        int sumaTodo = 0;
+        int valorContador = 0;
+        for (TaqueriasDAO item : Lista) {
+            sumaTodo += item.getPrecio();
+            valorContador++;
+        }
+
         tbvTaquerias.getItems().clear();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Compra Exitosa");
-        alert.setHeaderText(null);
-        alert.setContentText("Gracias por su compra");
+        alert.setHeaderText("Detalle De Su Compra: ");
+        alert.setContentText("Gracias por su compra. Total a Pagar es: " + sumaTodo + ", Cantidad de Productos Comprados: " + valorContador);
         alert.getButtonTypes().setAll(ButtonType.OK);
         alert.showAndWait();
+
         taqueriasDAO.eliminarTodo();
         Platform.exit();
+    }
+
+    private void LimpiarSuge(){
+        tbvTaque.getItems().clear();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Recomendacion Exitosa");
+        alert.setHeaderText(null);
+        alert.setContentText("Gracias Por Su Recomendacion");
+        alert.getButtonTypes().setAll(ButtonType.OK);
+        alert.showAndWait();
     }
 
 }

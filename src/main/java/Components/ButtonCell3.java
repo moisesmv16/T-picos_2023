@@ -1,20 +1,18 @@
 package Components;
 
-import Vistas.CategoriaForm;
 import javafx.scene.control.*;
-import modelos.CategoriasDAO;
 import modelos.TaqueriasDAO;
 
 import java.util.Optional;
 
-public class ButtonCell2 extends TableCell<TaqueriasDAO,String> {
+public class ButtonCell3 extends TableCell<TaqueriasDAO,String> {
     private Button btnCelda;
     private int opc;
     private TableView<TaqueriasDAO> tbvTaquerias;
     private TableView<TaqueriasDAO> tbvTaque;
     private TaqueriasDAO objTaq;
 
-    public ButtonCell2(int opc){
+    public ButtonCell3(int opc){
         this.opc = opc;
         String txtBtn = this.opc == 1 ? "Editar" : "Eliminar";
         btnCelda=new Button(txtBtn);
@@ -22,8 +20,8 @@ public class ButtonCell2 extends TableCell<TaqueriasDAO,String> {
     }
 
     private void accionBoton(){
-        tbvTaquerias = ButtonCell2.this.getTableView();
-        objTaq = tbvTaquerias.getItems().get(ButtonCell2.this.getIndex());
+        tbvTaquerias = ButtonCell3.this.getTableView();
+        objTaq = tbvTaquerias.getItems().get(ButtonCell3.this.getIndex());
 
         if(this.opc ==1){
             //new CategoriaForm(tbvTaquerias, objCat);
@@ -35,9 +33,10 @@ public class ButtonCell2 extends TableCell<TaqueriasDAO,String> {
 
             Optional<ButtonType> result = alert.showAndWait();
             if(result.get() == ButtonType.OK){
-                objTaq.ELIMINARPLATILLO();
-                objTaq.ELIMINARPLATILLOTODO();
-                tbvTaquerias.setItems(objTaq.LISTARPRODUCTOS());
+                //objTaq.ELIMINARPLATILLO();
+                //objTaq.ELIMINARPLATILLOTODO();
+                objTaq.ELIMINARCATEGORIANUEVA();
+                tbvTaquerias.setItems(objTaq.LISTARCATEGORIAS());
                 tbvTaquerias.refresh();
             }
         }

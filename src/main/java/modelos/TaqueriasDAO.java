@@ -193,6 +193,8 @@ public class TaqueriasDAO {
                 objC = new TaqueriasDAO();
                 objC.setIdPlatillo(res.getInt("idPlatillo"));
                 objC.setNombrePlatillo(res.getString("nombre"));
+                objC.setImagenPlatillo(res.getString("imagenPlatillo"));
+                objC.setPrecio(res.getInt("precio"));
                 ListTaq.add(objC);
             }
         }catch (Exception e){
@@ -240,6 +242,28 @@ public class TaqueriasDAO {
             e.printStackTrace();
         }
     }
+
+    public void ELIMINARCATEGORIANUEVA(){
+        try{
+            String query = "DELETE FROM Categorias WHERE idCategoria = "+this.idCategoria;
+            Statement stmt = Conexion.conexion.createStatement();
+            stmt.executeUpdate(query);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void ELIMINARPEDIDO(){
+        try{
+            String queryPedido = "DELETE FROM pedido";
+            Statement stmtPedido = Conexion.conexion.createStatement();
+            stmtPedido.executeUpdate(queryPedido);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
 
 
 }
