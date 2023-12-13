@@ -19,7 +19,7 @@ public class HelloApplication extends Application {
     private MenuBar menuBar;
     private Menu menuParcial1,menuParcial2, menuSalir;
     private MenuItem mitCalculadora;
-    private MenuItem miLoteria,mitSalir,mitRestaurante,mitBaileys,mitPista;
+    private MenuItem miLoteria,mitSalir,mitRestaurante,mitBaileys,mitPista,mitImpresion;
 
     private void CrearUI(){
         mitCalculadora = new MenuItem("Calculadora");//crea mit calculadora con la etiqueta calculadora
@@ -42,8 +42,11 @@ public class HelloApplication extends Application {
         mitPista=new MenuItem("Pista");
         mitPista.setOnAction(event -> new PistaAtletismo());
 
+        mitImpresion=new MenuItem("Simulador de Impresion");
+        mitImpresion.setOnAction(event -> new Impresion());
+
         menuParcial2 = new Menu("Parcial 2");//crea un menu parcial 2
-        menuParcial2.getItems().addAll(mitRestaurante,mitBaileys,mitPista);
+        menuParcial2.getItems().addAll(mitRestaurante,mitBaileys,mitPista,mitImpresion);
 
 
         menuSalir=new Menu("Mas opciones");//crea un menu mas opciones

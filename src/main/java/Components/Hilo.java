@@ -2,8 +2,6 @@ package Components;
 
 import javafx.scene.control.ProgressBar;
 
-import java.util.Random;
-
 public class Hilo extends Thread{
     private ProgressBar pgbCorredor;
     public  Hilo(String nombre,ProgressBar pgb){
@@ -25,7 +23,6 @@ public class Hilo extends Thread{
             }
             //System.out.println("Corredor " + this.getName() + " Llego a la meta ");
         }catch (Exception e){
-
         }
     }
 }

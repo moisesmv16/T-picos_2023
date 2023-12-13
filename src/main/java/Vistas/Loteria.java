@@ -184,9 +184,8 @@ public class Loteria extends Stage {
         if(juegoEnMarcha) {
             ImageView imageView = (ImageView) boton.getGraphic();
             Image imagenBoton = imageView.getImage();
-            // Compara la imagen del mazo con la imagen del botón
             if (imagenBoton != null && imagenMazo != null && imagenBoton.getUrl().equals(imagenMazo.getUrl())) {
-                boton.setDisable(true); // Marca el botón como seleccionado
+                boton.setDisable(true);
                 verificarEstadoJuego();
             }
         }
@@ -204,9 +203,8 @@ public class Loteria extends Stage {
             }
         }
         if (todasDeshabilitadas) {
-            mostrarMensajeJuego(true); // Mostrar mensaje de que ganó
+            mostrarMensajeJuego(true);
         }
-
         return todasDeshabilitadas;
     }
 
@@ -220,4 +218,7 @@ public class Loteria extends Stage {
         }
         alert.showAndWait();
     }
+
+
+
 }
